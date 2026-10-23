@@ -79,3 +79,18 @@ def render_grep_text(result: GrepResult) -> str:
     lines.append("")
     lines.append(f"Malformed lines skipped: {result.malformed_count}")
     return "\n".join(lines)
+
+
+def render_grep_markdown_lines(result: GrepResult) -> List[str]:
+    lines = [f"- Match count: {len(result.matches)}", ""]
+    if result.matches:
+        lines.extend(["| Timestamp | Level | Message |", "| --- | --- | --- |"])
+        lines.extend(
+            f"| {record.timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {record.level} | {record.message} |"
+            for record in result.matches
+        )
+    else:
+        lines.append("(no matching lines)")
+
+    lines.extend(["", f"- Malformed lines skipped: {result.malformed_count}"])
+    return lines

@@ -5,9 +5,10 @@ import argparse
 import sys
 from typing import List, Optional
 
-from .grep import compute_grep, render_grep_text
-from .summary import compute_summary, render_summary_text
-from .timeline import compute_timeline, render_timeline_text
+from .formatter import render_json, write_markdown_report
+from .grep import compute_grep, render_grep_markdown_lines, render_grep_text
+from .summary import compute_summary, render_summary_markdown_lines, render_summary_text
+from .timeline import compute_timeline, render_timeline_markdown_lines, render_timeline_text
 
 FORMAT_CHOICES = ("text", "json", "md")
 LEVEL_CHOICES = ("INFO", "WARN", "ERROR")
@@ -58,13 +59,14 @@ def run_summary(logfile: str, output_format: str) -> int:
 
     if output_format == "text":
         print(render_summary_text(result))
-        return 0
-
-    print(
-        f"logscope: error: --format {output_format} is not supported yet",
-        file=sys.stderr,
-    )
-    return 2
+    elif output_format == "json":
+        print(render_json(result.to_dict()))
+    elif output_format == "md":
+        path = write_markdown_report(
+            "summary", "logscope summary report", render_summary_markdown_lines(result)
+        )
+        print(f"Markdown report written to: {path}")
+    return 0
 
 
 def run_timeline(logfile: str, bucket: str, output_format: str) -> int:
@@ -79,13 +81,14 @@ def run_timeline(logfile: str, bucket: str, output_format: str) -> int:
 
     if output_format == "text":
         print(render_timeline_text(result))
-        return 0
-
-    print(
-        f"logscope: error: --format {output_format} is not supported yet",
-        file=sys.stderr,
-    )
-    return 2
+    elif output_format == "json":
+        print(render_json(result.to_dict()))
+    elif output_format == "md":
+        path = write_markdown_report(
+            "timeline", "logscope timeline report", render_timeline_markdown_lines(result)
+        )
+        print(f"Markdown report written to: {path}")
+    return 0
 
 
 def run_grep(logfile: str, level: Optional[str], since: Optional[str], output_format: str) -> int:
@@ -100,13 +103,14 @@ def run_grep(logfile: str, level: Optional[str], since: Optional[str], output_fo
 
     if output_format == "text":
         print(render_grep_text(result))
-        return 0
-
-    print(
-        f"logscope: error: --format {output_format} is not supported yet",
-        file=sys.stderr,
-    )
-    return 2
+    elif output_format == "json":
+        print(render_json(result.to_dict()))
+    elif output_format == "md":
+        path = write_markdown_report(
+            "grep", "logscope grep report", render_grep_markdown_lines(result)
+        )
+        print(f"Markdown report written to: {path}")
+    return 0
 
 
 def main(argv: Optional[List[str]] = None) -> int:

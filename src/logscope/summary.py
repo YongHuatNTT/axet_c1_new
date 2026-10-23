@@ -113,3 +113,49 @@ def render_summary_text(result: SummaryResult) -> str:
         ]
     )
     return "\n".join(lines)
+
+
+def render_summary_markdown_lines(result: SummaryResult) -> List[str]:
+    first_ts = (
+        result.first_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        if result.first_timestamp
+        else "N/A"
+    )
+    last_ts = (
+        result.last_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        if result.last_timestamp
+        else "N/A"
+    )
+
+    lines = [
+        "## Level counts",
+        "",
+        "| Level | Count |",
+        "| --- | --- |",
+        f"| INFO | {result.info_count} |",
+        f"| WARN | {result.warn_count} |",
+        f"| ERROR | {result.error_count} |",
+        "",
+        "## Top 5 error messages",
+        "",
+    ]
+    if result.top_errors:
+        lines.extend(["| Count | Message |", "| --- | --- |"])
+        lines.extend(f"| {count} | {message} |" for message, count in result.top_errors)
+    else:
+        lines.append("(none)")
+
+    lines.extend(
+        [
+            "",
+            "## Timestamps",
+            "",
+            f"- First timestamp: {first_ts}",
+            f"- Last timestamp: {last_ts}",
+            "",
+            "## Malformed lines",
+            "",
+            f"- Malformed line count: {result.malformed_count}",
+        ]
+    )
+    return lines

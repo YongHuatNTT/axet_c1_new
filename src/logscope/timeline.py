@@ -112,3 +112,18 @@ def render_timeline_text(result: TimelineResult) -> str:
 
     lines.extend(["", f"Malformed lines: {result.malformed_count}"])
     return "\n".join(lines)
+
+
+def render_timeline_markdown_lines(result: TimelineResult) -> List[str]:
+    lines = [f"- Bucket size: {result.bucket_spec}", ""]
+    if not result.buckets:
+        lines.append("(no ERROR records found)")
+    else:
+        lines.extend(["| Bucket start | Error count |", "| --- | --- |"])
+        lines.extend(
+            f"| {start.strftime('%Y-%m-%d %H:%M:%S')} | {count} |"
+            for start, count in result.buckets
+        )
+
+    lines.extend(["", f"- Malformed line count: {result.malformed_count}"])
+    return lines
