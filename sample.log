@@ -1,0 +1,16 @@
+2026-10-01 09:00:00 INFO Application started
+2026-10-01 09:01:00 WARN Slow response detected
+2026-10-01 09:02:00 ERROR Database connection failed
+2026-10-01 09:03:00 INFO User login successful
+2026-10-01 09:04:00 ERROR Database connection failed
+2026-10-01 09:05:00 WARN Cache miss spike
+malformed line without timestamp and level
+2026-10-01 09:06:00 ERROR Timeout while calling payment API
+2026-10-01 09:07:00 INFO Health check passed
+2026-10-01 09:15:00 ERROR Database connection failed
+2026-10-01 09:16:00 INFO Background job completed
+2026-10-01 09:17:00 WARN Slow query detected
+2026-10-01 09:20:00 ERROR Timeout while calling payment API
+2026-10-01 09:21:00 INFO Session refreshed
+2026-10-01 BADTS ERROR broken timestamp example
+2026-10-01 09:22:00 ERROR Disk space critically low
