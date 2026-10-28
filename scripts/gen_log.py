@@ -1,11 +1,18 @@
 """Generate a synthetic log file for benchmarking logscope.
 
-Usage:
+Usage (run from the project root, with the project's Python interpreter):
+    python scripts/gen_log.py --target-mb 100 --output bench.log
     python3 scripts/gen_log.py --target-mb 100 --output bench.log
+
+Works the same on Windows, macOS, Linux, and inside WSL. Always use
+forward slashes in the path (``scripts/gen_log.py``) even on Windows --
+backslashes can be swallowed as escape characters by some shells.
 
 Produces a log with a realistic mix of INFO, WARN, ERROR and a small
 percentage of malformed lines, streamed directly to disk so the generator
-itself never buffers the whole file in memory.
+itself never buffers the whole file in memory. Line endings are forced to
+``\\n`` on every platform so the output byte size is identical regardless
+of whether this runs on Windows or Linux.
 """
 from __future__ import annotations
 
@@ -87,7 +94,7 @@ def generate_log(output_path: Path, target_mb: float, seed: int = 42) -> int:
     line_count = 0
     bytes_written = 0
 
-    with open(output_path, "w", encoding="utf-8") as handle:
+    with open(output_path, "w", encoding="utf-8", newline="\n") as handle:
         while bytes_written < target_bytes:
             if rng.random() < MALFORMED_RATE:
                 line = rng.choice(MALFORMED_LINES)
@@ -105,14 +112,25 @@ def generate_log(output_path: Path, target_mb: float, seed: int = 42) -> int:
     return line_count
 
 
+def _default_output_path() -> Path:
+    """Default to <project root>/bench.log, regardless of current working directory."""
+    project_root = Path(__file__).resolve().parent.parent
+    return project_root / "bench.log"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a synthetic logscope benchmark log")
     parser.add_argument("--target-mb", type=float, default=100.0, help="Target file size in MB")
-    parser.add_argument("--output", type=str, default="bench.log", help="Output file path")
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Output file path (default: <project root>/bench.log)",
+    )
     parser.add_argument("--seed", type=int, default=42, help="Random seed for determinism")
     args = parser.parse_args()
 
-    output_path = Path(args.output)
+    output_path = Path(args.output) if args.output else _default_output_path()
     line_count = generate_log(output_path, args.target_mb, seed=args.seed)
     size_mb = output_path.stat().st_size / BYTES_PER_MB
     print(f"Wrote {line_count} lines, {size_mb:.2f} MB -> {output_path}")
